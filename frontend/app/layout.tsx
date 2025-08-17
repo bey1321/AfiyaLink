@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { gotham } from "../common/fonts/fonts";
-import Header from "./components/header";
-import Footer from "./components/footer";
+import Header from "./_components/header";
+import Footer from "./_components/footer";
 
 export const metadata: Metadata = {
   title: "Afiyalink",
