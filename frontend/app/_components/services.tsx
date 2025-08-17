@@ -4,7 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "@/common/components/ui/card";
 import { services_data } from "../_lib/services_data";
 
 export function Services() {

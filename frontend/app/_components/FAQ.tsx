@@ -6,8 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "../../components/ui/accordion";
-import { Button } from "../../components/ui/button";
+} from "@/common/components/ui/accordion";
+import { Button } from "@/common/components/ui/button";
 import { faq_data as faqs } from "../_lib/faq_data";
 
 export default function Faq() {
