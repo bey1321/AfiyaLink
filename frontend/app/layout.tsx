@@ -14,7 +14,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${gotham.variable} font-sans antialiased`}>
+      <body
+        className={`${gotham.variable} font-sans antialiased min-h-screen flex flex-col`}
+      >
         <Header />
         <main className="flex-grow">{children}</main>
         <Footer />

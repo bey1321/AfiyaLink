@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/common/components/ui/card";
+import { Card, CardContent } from "@/common/components/ui";
 import Image from "next/image";
 
   interface ITestimonialProps {

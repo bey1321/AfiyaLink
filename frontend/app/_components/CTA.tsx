@@ -1,4 +1,4 @@
-import { Button } from "@/common/components/ui/button";
+import { Button } from "@/common/components/ui";
 
 export function CTA() {
   return (
