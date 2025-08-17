@@ -1,4 +1,4 @@
-import { Button } from "@/common/components/ui/button";
+import { Button } from "@/common/components/ui";
 import Image from "next/image";
 
 export default function Header() {
