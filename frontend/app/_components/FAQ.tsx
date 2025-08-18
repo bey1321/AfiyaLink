@@ -30,8 +30,7 @@ export default function Faq() {
         {/* header */}
         <div className="text-center mb-10">
           <h2
-            className="text-3xl sm:text-4xl font-bold"
-            style={{ color: "var(--primary-color)" }}
+            className="text-3xl sm:text-4xl font-bold text-primary-color"
           >
             Frequently Asked Questions
           </h2>

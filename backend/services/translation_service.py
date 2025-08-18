@@ -2,14 +2,23 @@ from openai import OpenAI
 from translate import Translator
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
+# Get API key from .env
+api_key = os.getenv("OPENROUTER_API_KEY")
+base_url = os.getenv("OPENROUTER_BASE_URL")
+text_refining_model = os.getenv("TEXT_REFINING_MODEL")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 # OpenAI (OpenRouter) client
 client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key="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"
+    base_url=base_url,
+    api_key=api_key
 )
 
 def load_prompt_template(file_path: str) -> str:
@@ -27,7 +36,7 @@ def refine_medical_text(raw_text: str) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-r1",
+            model=text_refining_model,
             messages=[
                 {
                     "role": "system",

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import {
@@ -14,30 +14,36 @@ import {
   Textarea,
   Button,
 } from "@/common/components/ui";
-
-const languages = [
-  "English",
-  "Chinese (Simplified)",
-  "Spanish",
-  "French",
-  "Arabic",
-  "Amharic",
-  "Hindi",
-  // add more as needed
-];
+import { languages } from "../_lib/language_list"; 
+import { translateText } from "../_lib/api"; 
 
 export default function MedicalTranslator() {
-  const [sourceLang, setSourceLang] = useState("Chinese (Simplified)");
-  const [targetLang, setTargetLang] = useState("English");
+  const [sourceLang, setSourceLang] = useState("zh-cn");
+  const [targetLang, setTargetLang] = useState("en");
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSwap = () => {
-    const temp = sourceLang;
     setSourceLang(targetLang);
-    setTargetLang(temp);
+    setTargetLang(sourceLang);
     setInputText(translatedText);
     setTranslatedText(inputText);
+  };
+
+  const handleTranslate = async () => {
+    if (!inputText.trim()) return;
+
+    setLoading(true);
+    try {
+      const data = await translateText(inputText, sourceLang, targetLang);
+      setTranslatedText(data.translated_text || "");
+    } catch (error) {
+      console.error("Translation failed:", error);
+      setTranslatedText("⚠️ Translation failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,15 +52,16 @@ export default function MedicalTranslator() {
         <CardTitle>Medical Translator</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* Language selectors */}
         <div className="flex gap-4 mb-4 items-center">
           <Select value={sourceLang} onValueChange={setSourceLang}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select source language" />
             </SelectTrigger>
             <SelectContent>
-              {languages.map((lang) => (
-                <SelectItem key={lang} value={lang}>
-                  {lang}
+              {languages.map((lang, idx) => (
+                <SelectItem key={`${lang.code}-${idx}`} value={lang.code}>
+                  {lang.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -69,15 +76,16 @@ export default function MedicalTranslator() {
               <SelectValue placeholder="Select target language" />
             </SelectTrigger>
             <SelectContent>
-              {languages.map((lang) => (
-                <SelectItem key={lang} value={lang}>
-                  {lang}
+              {languages.map((lang, idx) => (
+                <SelectItem key={`${lang.code}-${idx}`} value={lang.code}>
+                  {lang.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
+        {/* Textareas */}
         <div className="flex gap-4">
           <Textarea
             value={inputText}
@@ -87,15 +95,16 @@ export default function MedicalTranslator() {
           />
           <Textarea
             value={translatedText}
-            placeholder="Translation"
+            placeholder={loading ? "Translating..." : "Translation"}
             readOnly
             className="h-40 bg-muted"
           />
         </div>
 
+        {/* Translate button */}
         <div className="mt-4 flex justify-end">
-          <Button onClick={() => setTranslatedText(inputText)}>
-            Translate
+          <Button onClick={handleTranslate} disabled={loading}>
+            {loading ? "Translating..." : "Translate"}
           </Button>
         </div>
       </CardContent>
