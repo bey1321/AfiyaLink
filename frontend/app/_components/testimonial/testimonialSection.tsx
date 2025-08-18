@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeInVariant } from "../_lib/motionVariants";
+import { fadeInVariant } from "../../_lib/motionVariants";
 import { TestimonialComponent } from "./testimonial";
 
 export function Testimonial() {

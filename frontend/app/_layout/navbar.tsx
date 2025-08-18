@@ -1,7 +1,7 @@
 import { Button } from "@/common/components/ui";
 import Image from "next/image";
 
-export default function Header() {
+export default function Navbar() {
   return (
     <header className="w-full flex items-center justify-between px-8 py-4 bg-primary-color">
       {/* Logo & Name */}

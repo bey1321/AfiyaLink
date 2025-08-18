@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { gotham } from "../common/fonts/fonts";
-import Header from "./_components/header";
-import Footer from "./_components/footer";
+import Navbar from "./_layout/navbar";
+import Footer from "./_layout/footer";
 
 export const metadata: Metadata = {
   title: "Afiyalink",
@@ -17,7 +17,7 @@ export default function RootLayout({
       <body
         className={`${gotham.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
-        <Header />
+        <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
       </body>

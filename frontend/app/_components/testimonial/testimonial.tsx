@@ -1,9 +1,9 @@
 "use client";
 
-import { testimonials } from "../_lib/testimonialContent";
+import { testimonials } from "../../_lib/testimonialContent";
 import Marquee from "react-fast-marquee";
 import { TestimonialCard } from "./testimonialCard";
-import "../styles/marquee.css"; // contains vertical animations
+import "../../styles/marquee.css"; // contains vertical animations
 
 export const TestimonialComponent = () => {
   return (

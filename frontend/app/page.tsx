@@ -3,7 +3,8 @@ import {Services} from "./_components/services"
 import {CTA} from "./_components/CTA"
 import Faq from "./_components/FAQ"
 import {KeyFeatures} from "./_components/features"
-import {Testimonial} from "./_components/testimonialSection"
+import {Testimonial} from "./_components/testimonial/testimonialSection"
+import UserFeedback from "./_components/feedback"
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
       <KeyFeatures />
       <Faq />
       <Testimonial />
+      <UserFeedback />
       <CTA/>
     </div>
   );
