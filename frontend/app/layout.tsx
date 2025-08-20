@@ -17,9 +17,9 @@ export default function RootLayout({
       <body
         className={`${gotham.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
-        <Navbar />
+        {/* <Navbar /> */}
         <main className="flex-grow">{children}</main>
-        <Footer />
+        {/* <Footer /> */}
       </body>
     </html>
   );
