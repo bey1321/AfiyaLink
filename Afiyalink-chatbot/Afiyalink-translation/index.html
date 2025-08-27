@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfiyaLink Healthcare Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #e8f5e8;
+            border-radius: 20px;
+            border: 1px solid #4CAF50;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            gap: 2rem;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .emergency-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: emergencyPulse 2s infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes emergencyPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        .emergency-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .settings-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .chat-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: 700px;
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .chat-header h2 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .chat-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #f8f9fa;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: messageSlide 0.3s ease-out;
+            word-wrap: break-word;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: white;
+            color: #2c3e50;
+            align-self: flex-start;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.emergency {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            color: white;
+            align-self: flex-start;
+            border: 2px solid #ff1744;
+            animation: emergencyAlert 1s ease-out;
+            max-width: 90%;
+        }
+
+        @keyframes emergencyAlert {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .message-info {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .input-container {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            min-height: 50px;
+            max-height: 120px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            resize: none;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .send-button {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 1rem 1.5rem;
+            justify-content: center;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: loadingBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .system-stats {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .system-stats h4 {
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .emergency-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .emergency-modal.hidden {
+            display: none;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .emergency-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease-out;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .emergency-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-content h2 {
+            color: #ff4757;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .emergency-numbers {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: left;
+            border-left: 4px solid #ff4757;
+        }
+
+        .emergency-numbers h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-numbers p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .close-emergency {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-emergency:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid #4CAF50;
+            background: transparent;
+            color: #4CAF50;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .sample-queries {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .sample-queries h4 {
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .sample-query {
+            background: white;
+            border: 1px solid #4CAF50;
+            border-radius: 15px;
+            padding: 0.5rem 0.75rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .sample-query:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 0 0.5rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .chat-container {
+                height: 600px;
+                order: 1;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .message {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🏥</div>
+            <h1>AfiyaLink Healthcare Chatbot</h1>
+        </div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span id="systemStatus">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <button class="emergency-button" onclick="showEmergency()">
+                🚨 EMERGENCY HELP
+            </button>
+
+            <div id="connectionStatus" class="connection-status disconnected">
+                Checking connection...
+            </div>
+
+            <div class="settings-section">
+                <h3>Chat Settings</h3>
+                
+                <div class="form-group">
+                    <label for="language">Language:</label>
+                    <select id="language" onchange="updateSettings()">
+                        <option value="en">English</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="ur">اردو (Urdu)</option>
+                        <option value="fr">Français (French)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cultural">Cultural Background:</label>
+                    <select id="cultural" onchange="updateSettings()">
+                        <option value="general">General</option>
+                        <option value="islamic">Islamic</option>
+                        <option value="muslim">Muslim</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" placeholder="Auto-generated" readonly>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="clearChat()">Clear</button>
+                    <button class="quick-action-btn" onclick="exportChat()">Export</button>
+                </div>
+            </div>
+
+            <div class="sample-queries">
+                <h4>Sample Health Queries</h4>
+                <div class="sample-query" onclick="sendSampleQuery('I have a headache')">I have a headache</div>
+                <div class="sample-query" onclick="sendSampleQuery('What should I do for fever?')">What should I do for fever?</div>
+                <div class="sample-query" onclick="sendSampleQuery('I have chest pain')">I have chest pain</div>
+                <div class="sample-query" onclick="sendSampleQuery('When should I see a doctor?')">When should I see a doctor?</div>
+            </div>
+
+            <div class="system-stats">
+                <h4>System Status</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span>Response Time:</span>
+                        <span id="responseTime">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Emergency Ready:</span>
+                        <span id="emergencyReady">🔄</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Messages Sent:</span>
+                        <span id="messageCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Backend Status:</span>
+                        <span id="backendStatus">Checking...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Healthcare Assistant</h2>
+                <p>Ask about symptoms, get medical guidance, or request emergency help. Always consult healthcare professionals for proper diagnosis and treatment.</p>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="message bot">
+                    <div>Welcome to AfiyaLink Healthcare! I'm here to provide reliable health information and guidance. How can I help you today?</div>
+                    <div class="message-info">
+                        <span>Healthcare Bot • Ready</span>
+                        <span>Culturally Sensitive • Multi-language</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="input-field" 
+                        placeholder="Describe your symptoms or ask a health question..."
+                        rows="1"
+                        onkeydown="handleKeyPress(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    <button id="sendButton" class="send-button" onclick="sendMessage()">
+                        <span>Send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="emergencyModal" class="emergency-modal hidden">
+        <div class="emergency-content">
+            <div class="emergency-icon">🚨</div>
+            <h2>MEDICAL EMERGENCY</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>CALL EMERGENCY SERVICES IMMEDIATELY</strong></p>
+            
+            <div class="emergency-numbers">
+                <h4>Emergency Numbers:</h4>
+                <p>🇺🇸 United States: <strong>911</strong></p>
+                <p>🇬🇧 United Kingdom: <strong>999</strong></p>
+                <p>🇪🇺 European Union: <strong>112</strong></p>
+                <p>🇮🇳 India: <strong>102</strong></p>
+            </div>
+
+            <div style="text-align: left; margin: 1rem 0; background: white; padding: 1rem; border-radius: 8px; border: 2px solid #ff4757;">
+                <h4 style="color: #ff4757; margin-bottom: 0.5rem;">Immediate Actions:</h4>
+                <ul style="margin-left: 1rem;">
+                    <li>Stay calm and call for help</li>
+                    <li>Follow dispatcher instructions exactly</li>
+                    <li>Stay with the person if safe to do so</li>
+                    <li>Be prepared for CPR if trained</li>
+                    <li>Do not move the person unless in immediate danger</li>
+                </ul>
+            </div>
+
+            <p style="color: #ff4757; font-weight: bold; font-size: 1.1rem; margin: 1rem 0;">
+                ⚠️ TIME IS CRITICAL - EVERY SECOND COUNTS
+            </p>
+
+            <button class="close-emergency" onclick="hideEmergency()">
+                I Understand - Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://127.0.0.1:8000';
+        
+        // Global state
+        let isLoading = false;
+        let messageCount = 0;
+        let isConnected = false;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AfiyaLink Healthcare Chatbot Frontend Loaded');
+            generateUserId();
+            checkConnection();
+            loadSettings();
+            
+            // Check connection periodically
+            setInterval(checkConnection, 10000);
+        });
+
+        function generateUserId() {
+            const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            document.getElementById('userId').value = userId;
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateConnectionStatus(true, data);
+                } else {
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                console.error('Connection check failed:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateConnectionStatus(connected, data = null) {
+            isConnected = connected;
+            const statusElement = document.getElementById('connectionStatus');
+            const systemStatus = document.getElementById('systemStatus');
+            const backendStatus = document.getElementById('backendStatus');
+            const emergencyReady = document.getElementById('emergencyReady');
+
+            if (connected) {
+                statusElement.className = 'connection-status connected';
+                statusElement.textContent = '✅ Connected to Healthcare System';
+                systemStatus.textContent = 'System Healthy';
+                backendStatus.textContent = 'Online';
+                emergencyReady.textContent = '✅';
+                
+                if (data) {
+                    console.log('Backend health check:', data);
+                }
+            } else {
+                statusElement.className = 'connection-status disconnected';
+                statusElement.textContent = '❌ Connection Lost - Check Backend';
+                systemStatus.textContent = 'Connection Error';
+                backendStatus.textContent = 'Offline';
+                emergencyReady.textContent = '❌';
+            }
+        }
+
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            if (!isConnected) {
+                alert('Not connected to healthcare backend. Please check your connection.');
+                return;
+            }
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            // Show loading indicator
+            showLoading();
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/health-chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        user_id: document.getElementById('userId').value,
+                        language: document.getElementById('language').value,
+                        cultural_background: document.getElementById('cultural').value
+                    })
+                });
+
+                const responseTime = (Date.now() - startTime) / 1000;
+                hideLoading();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Determine message type
+                    const messageType = data.emergency_alert ? 'emergency' : 'bot';
+                    
+                    // Add bot response
+                    addMessage(data.response, messageType, data);
+                    
+                    // Handle emergency alerts
+                    if (data.emergency_alert) {
+                        setTimeout(() => showEmergency(), 500);
+                    }
+                    
+                    // Update statistics
+                    updateStats(responseTime, data);
+                    
+                } else {
+                    const errorData = await response.json();
+                    addMessage(
+                        'I apologize for the technical issue. For any urgent health concerns, please consult with a healthcare professional immediately or call emergency services.',
+                        'bot'
+                    );
+                    console.error('API Error:', errorData);
+                }
+
+            } catch (error) {
+                console.error('Request failed:', error);
+                hideLoading();
+                addMessage(
+                    'Unable to connect to healthcare services. For medical emergencies, please call emergency services immediately: 911 (US), 999 (UK), 112 (EU).',
+                    'bot'
+                );
+            }
+        }
+
+        function addMessage(text, type, data = null) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            let messageInfo = '';
+            
+            if (data) {
+                const confidence = Math.round(data.confidence * 100);
+                const responseTime = data.response_time ? `${data.response_time.toFixed(2)}s` : '';
+                const riskLevel = data.risk_level || 'low';
+                const aiModel = data.used_ai_model || 'rule-based';
+                
+                messageInfo = `
+                    <div class="message-info">
+                        <span>Bot • ${data.intent} • ${confidence}% confidence</span>
+                        <span>Risk: ${riskLevel} • ${responseTime} • ${aiModel}</span>
+                    </div>
+                `;
+            } else if (type === 'user') {
+                messageInfo = `
+                    <div class="message-info">
+                        <span>You</span>
+                        <span>${new Date().toLocaleTimeString()}</span>
+                    </div>
+                `;
+            }
+            
+            // Format text for better readability
+            const formattedText = formatMessageText(text);
+            
+            messageDiv.innerHTML = `
+                <div>${formattedText}</div>
+                ${messageInfo}
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            messageCount++;
+            updateMessageCount();
+        }
+
+        function formatMessageText(text) {
+            // Convert line breaks to HTML and format emergency text
+            return text
+                .replace(/\n/g, '<br>')
+                .replace(/🚨/g, '<span style="color: #ff4757; font-weight: bold;">🚨</span>')
+                .replace(/⚠️/g, '<span style="color: #ff9500; font-weight: bold;">⚠️</span>')
+                .replace(/✅/g, '<span style="color: #4CAF50; font-weight: bold;">✅</span>');
+        }
+
+        function showLoading() {
+            isLoading = true;
+            const messagesContainer = document.getElementById('messagesContainer');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loadingMessage';
+            loadingDiv.className = 'message bot';
+            loadingDiv.innerHTML = `
+                <div class="loading-indicator">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+                <div style="text-align: center; margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
+                    Processing your health query...
+                </div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            document.getElementById('sendButton').disabled = true;
+            document.getElementById('sendButton').innerHTML = '<span>...</span>';
+        }
+
+        function hideLoading() {
+            isLoading = false;
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+            document.getElementById('sendButton').disabled = false;
+            document.getElementById('sendButton').innerHTML = '<span>Send</span>';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function showEmergency() {
+            document.getElementById('emergencyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Play alert sound if available
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUiCCKLzfPVgDIGJnzN8+OGQAXE+K8=');
+                audio.play();
+            } catch (e) {
+                console.log('Alert sound not available');
+            }
+        }
+
+        function hideEmergency() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateStats(responseTime, data) {
+            document.getElementById('responseTime').textContent = `${responseTime.toFixed(2)}s`;
+            
+            if (data && data.used_ai_model) {
+                document.getElementById('backendStatus').textContent = 'AI Enhanced';
+            }
+        }
+
+        function updateMessageCount() {
+            document.getElementById('messageCount').textContent = messageCount.toString();
+        }
+
+        function sendSampleQuery(query) {
+            document.getElementById('messageInput').value = query;
+            sendMessage();
+        }
+
+        function clearChat() {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                const messagesContainer = document.getElementById('messagesContainer');
+                messagesContainer.innerHTML = `
+                    <div class="message bot">
+                        <div>Chat cleared. Welcome back to AfiyaLink Healthcare! How can I help you today?</div>
+                        <div class="message-info">
+                            <span>Healthcare Bot • Ready</span>
+                            <span>Culturally Sensitive • Multi-language</span>
+                        </div>
+                    </div>
+                `;
+                messageCount = 1;
+                updateMessageCount();
+            }
+        }
+
+        function exportChat() {
+            const messages = document.querySelectorAll('.message');
+            let chatHistory = 'AfiyaLink Healthcare Chat Export\\n';
+            chatHistory += '=====================================\\n\\n';
+            chatHistory += `Export Date: ${new Date().toLocaleDateString()}\\n`;
+            chatHistory += `User ID: ${document.getElementById('userId').value}\\n`;
+            chatHistory += `Language: ${document.getElementById('language').value}\\n`;
+            chatHistory += `Cultural Background: ${document.getElementById('cultural').value}\\n\\n`;
+            
+            messages.forEach(message => {
+                const textContent = message.querySelector('div').textContent;
+                const isUser = message.classList.contains('user');
+                const isEmergency = message.classList.contains('emergency');
+                const timestamp = new Date().toLocaleTimeString();
+                
+                if (isEmergency) {
+                    chatHistory += `[${timestamp}] 🚨 EMERGENCY ALERT: ${textContent}\\n\\n`;
+                } else if (isUser) {
+                    chatHistory += `[${timestamp}] USER: ${textContent}\\n\\n`;
+                } else {
+                    chatHistory += `[${timestamp}] HEALTHCARE BOT: ${textContent}\\n\\n`;
+                }
+            });
+            
+            chatHistory += '\\n=====================================\\n';
+            chatHistory += 'AfiyaLink Healthcare Chatbot v3.0.0\\n';
+            chatHistory += 'MEDICAL DISCLAIMER:\\n';
+            chatHistory += 'This chat log is for informational purposes only.\\n';
+            chatHistory += 'Always consult qualified healthcare professionals for medical advice.\\n';
+            chatHistory += 'In emergencies, call your local emergency services immediately.\\n';
+            
+            const blob = new Blob([chatHistory], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `afiyalink-chat-${new Date().toISOString().slice(0, 19)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function updateSettings() {
+            saveSettings();
+            console.log('Settings updated');
+        }
+
+        function saveSettings() {
+            const settings = {
+                language: document.getElementById('language').value,
+                cultural: document.getElementById('cultural').value,
+                userId: document.getElementById('userId').value
+            };
+            localStorage.setItem('afiyalinkSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('afiyalinkSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    if (settings.language) document.getElementById('language').value = settings.language;
+                    if (settings.cultural) document.getElementById('cultural').value = settings.cultural;
+                    if (settings.userId) document.getElementById('userId').value = settings.userId;
+                }
+            } catch (error) {
+                console.log('Could not load saved settings');
+            }
+        }
+
+        // Test backend connectivity on load
+        async function testBackendEndpoints() {
+            const endpoints = [
+                { name: 'Health Check', url: '/health' },
+                { name: 'Emergency', url: '/api/v1/emergency' },
+                { name: 'System Status', url: '/api/v1/system-status' }
+            ];
+
+            console.log('Testing backend endpoints...');
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint.url}`);
+                    console.log(`✅ ${endpoint.name}: ${response.status}`);
+                } catch (error) {
+                    console.log(`❌ ${endpoint.name}: Failed`);
+                }
+            }
+        }
+
+        // Test endpoints on load
+        setTimeout(testBackendEndpoints, 2000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                sendMessage();
+            }
+            if (event.key === 'Escape') {
+                hideEmergency();
+            }
+            if (event.ctrlKey && event.key === 'l') {
+                event.preventDefault();
+                clearChat();
+            }
+        });
+
+        // Handle page visibility for connection management
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkConnection();
+            }
+        });
+
+        // Emergency test function for development
+        function testEmergency() {
+            showEmergency();
+        }
+
+        // Console helper for debugging
+        window.afiyalinkDebug = {
+            testConnection: checkConnection,
+            testEmergency: testEmergency,
+            testEndpoints: testBackendEndpoints,
+            clearStorage: () => localStorage.removeItem('afiyalinkSettings')
+        };
+
+        console.log('AfiyaLink Healthcare Chatbot Frontend Ready!');
+        console.log('Debug commands available in window.afiyalinkDebug');
+    </script>
+</body>
+</html>

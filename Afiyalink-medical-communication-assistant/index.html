@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Medical Communication System v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .system-title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .system-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .status-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+        }
+
+        .main-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .communication-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doctor-panel {
+            border-left: 4px solid #3498db;
+        }
+
+        .patient-panel {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .recording-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .record-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .record-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .record-btn.recording {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .recording-status {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .transcript-area {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            color: #2c3e50;
+            resize: none;
+            width: 100%;
+        }
+
+        .patient-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .patient-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        .analytics-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .conversation-history {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .conversation-entry {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .conversation-entry.doctor {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+        }
+
+        .conversation-entry.patient {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+        }
+
+        .speaker-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .speaker-badge.doctor {
+            background: #3498db;
+            color: white;
+        }
+
+        .speaker-badge.patient {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+            line-height: 1.6;
+        }
+
+        .message-meta {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .control-btn:hover {
+            background: #d5dbdb;
+            transform: translateY(-1px);
+        }
+
+        .language-selector {
+            padding: 8px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9em;
+            background: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        @media (max-width: 768px) {
+            .main-interface {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .system-title {
+                font-size: 2em;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="system-title">Enhanced Medical Communication System</h1>
+            <p class="system-subtitle">Professional-grade doctor-patient communication bridge v2.0</p>
+            
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Speech Recognition Ready</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>TTS Engine Active</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Database Connected</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Multi-language Support</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Communication Interface -->
+        <div class="main-interface">
+            <!-- Doctor Panel -->
+            <div class="communication-panel doctor-panel">
+                <h2 class="panel-title">
+                    🩺 Doctor Communication
+                </h2>
+                
+                <div class="recording-container">
+                    <button class="record-btn" id="doctorRecordBtn">
+                        <span>🎤</span>
+                        <span>Press to Record</span>
+                    </button>
+                    <div class="recording-status" id="doctorStatus">Ready to record doctor's speech</div>
+                </div>
+                
+                <textarea class="transcript-area" id="doctorTranscript" placeholder="Doctor's speech will appear here..." readonly></textarea>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearDoctorTranscript()">Clear</button>
+                    <button class="btn btn-primary" onclick="processDoctor()">Process Speech</button>
+                </div>
+            </div>
+
+            <!-- Patient Panel -->
+            <div class="communication-panel patient-panel">
+                <h2 class="panel-title">
+                    🏥 Patient Response
+                </h2>
+                
+                <textarea class="patient-input" id="patientInput" placeholder="Type patient's message here..."></textarea>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearPatientInput()">Clear</button>
+                    <button class="btn btn-primary" onclick="speakPatientMessage()">
+                        <span id="speakBtnText">Speak Message</span>
+                        <div class="loading" id="speakLoading" style="display: none;"></div>
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="languageSelect">Language: </label>
+                    <select class="language-selector" id="languageSelect">
+                        <option value="auto">Auto-detect</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="ar">Arabic</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Panel -->
+        <div class="analytics-panel">
+            <h2 class="panel-title">📊 Session Analytics</h2>
+            
+            <div class="analytics-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="exchangeCount">0</span>
+                    <div class="stat-label">Exchanges</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="totalMessages">0</span>
+                    <div class="stat-label">Messages</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="sessionDuration">00:00</span>
+                    <div class="stat-label">Duration</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="avgMessageLength">0</span>
+                    <div class="stat-label">Avg Length</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversation History -->
+        <div class="conversation-history">
+            <h2 class="panel-title">💬 Conversation History</h2>
+            <div id="conversationList">
+                <p style="color: #7f8c8d; text-align: center; padding: 20px;">No conversations yet. Start by recording doctor's speech or typing patient message.</p>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <button class="control-btn" onclick="showSystemInfo()">System Info</button>
+            <button class="control-btn" onclick="exportSession()">Export Session</button>
+            <button class="control-btn" onclick="resetSession()">Reset Session</button>
+            <button class="control-btn" onclick="showHelp()">Help</button>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Global state management
+        let isRecording = false;
+        let recognition = null;
+        let sessionStartTime = Date.now();
+        let exchangeCount = 0;
+        let conversationHistory = [];
+        let sessionStats = {
+            totalMessages: 0,
+            totalCharacters: 0
+        };
+
+        // Initialize Web Speech API
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                recognition.onstart = () => {
+                    isRecording = true;
+                    updateRecordingUI(true);
+                    showNotification('Recording started', 'info');
+                };
+                
+                recognition.onresult = (event) => {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    document.getElementById('doctorTranscript').value = finalTranscript + interimTranscript;
+                    
+                    if (finalTranscript) {
+                        addToConversationHistory('doctor', finalTranscript);
+                        updateSessionStats();
+                    }
+                };
+                
+                recognition.onerror = (event) => {
+                    showNotification(`Speech recognition error: ${event.error}`, 'error');
+                    stopRecording();
+                };
+                
+                recognition.onend = () => {
+                    stopRecording();
+                };
+                
+                showNotification('Speech recognition initialized', 'success');
+            } else {
+                showNotification('Speech recognition not supported in this browser', 'error');
+                document.getElementById('doctorStatus').textContent = 'Speech recognition not available - please use Chrome or Edge';
+            }
+        }
+
+        // Recording controls
+        function toggleRecording() {
+            if (!recognition) {
+                showNotification('Speech recognition not available', 'error');
+                return;
+            }
+            
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                const language = document.getElementById('languageSelect').value;
+                if (language !== 'auto') {
+                    recognition.lang = language === 'en' ? 'en-US' : 
+                                     language === 'es' ? 'es-ES' :
+                                     language === 'fr' ? 'fr-FR' :
+                                     language === 'ar' ? 'ar-SA' :
+                                     language === 'de' ? 'de-DE' :
+                                     language === 'it' ? 'it-IT' : 'en-US';
+                }
+                recognition.start();
+            }
+        }
+
+        function updateRecordingUI(recording) {
+            const btn = document.getElementById('doctorRecordBtn');
+            const status = document.getElementById('doctorStatus');
+            
+            if (recording) {
+                btn.classList.add('recording');
+                btn.innerHTML = '<span>🔴</span><span>Recording...</span>';
+                status.textContent = 'Listening... Speak clearly';
+            } else {
+                btn.classList.remove('recording');
+                btn.innerHTML = '<span>🎤</span><span>Press to Record</span>';
+                status.textContent = 'Ready to record doctor\'s speech';
+            }
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            updateRecordingUI(false);
+            if (document.getElementById('doctorTranscript').value.trim()) {
+                showNotification('Speech recorded successfully', 'success');
+            }
+        }
+
+        // Text-to-speech functionality
+        function speakPatientMessage() {
+            const message = document.getElementById('patientInput').value.trim();
+            if (!message) {
+                showNotification('Please enter a patient message', 'error');
+                return;
+            }
+
+            if ('speechSynthesis' in window) {
+                // Show loading state
+                const btnText = document.getElementById('speakBtnText');
+                const loading = document.getElementById('speakLoading');
+                btnText.style.display = 'none';
+                loading.style.display = 'inline-block';
+
+                const utterance = new SpeechSynthesisUtterance(message);
+                
+                // Configure speech
+                const language = document.getElementById('languageSelect').value;
+                if (language !== 'auto') {
+                    utterance.lang = language === 'en' ? 'en-US' : 
+                                   language === 'es' ? 'es-ES' :
+                                   language === 'fr' ? 'fr-FR' :
+                                   language === 'ar' ? 'ar-SA' :
+                                   language === 'de' ? 'de-DE' :
+                                   language === 'it' ? 'it-IT' : 'en-US';
+                }
+                
+                utterance.rate = 0.9;
+                utterance.volume = 0.8;
+                
+                utterance.onend = () => {
+                    btnText.style.display = 'inline';
+                    loading.style.display = 'none';
+                    showNotification('Message delivered successfully', 'success');
+                };
+                
+                utterance.onerror = () => {
+                    btnText.style.display = 'inline';
+                    loading.style.display = 'none';
+                    showNotification('Speech synthesis failed', 'error');
+                };
+                
+                speechSynthesis.speak(utterance);
+                
+                // Add to conversation history
+                addToConversationHistory('patient', message);
+                updateSessionStats();
+                exchangeCount++;
+                updateAnalytics();
+                
+            } else {
+                showNotification('Text-to-speech not supported in this browser', 'error');
+            }
+        }
+
+        // Conversation management
+        function addToConversationHistory(speaker, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = {
+                speaker,
+                message,
+                timestamp,
+                language: document.getElementById('languageSelect').value
+            };
+            
+            conversationHistory.push(entry);
+            updateConversationDisplay();
+        }
+
+        function updateConversationDisplay() {
+            const list = document.getElementById('conversationList');
+            
+            if (conversationHistory.length === 0) {
+                list.innerHTML = '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No conversations yet. Start by recording doctor\'s speech or typing patient message.</p>';
+                return;
+            }
+            
+            list.innerHTML = conversationHistory.map(entry => `
+                <div class="conversation-entry ${entry.speaker}">
+                    <div class="speaker-badge ${entry.speaker}">${entry.speaker === 'doctor' ? 'Doctor' : 'Patient'}</div>
+                    <div class="message-content">
+                        ${entry.message}
+                        <div class="message-meta">${entry.timestamp} • ${entry.language}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Scroll to bottom
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // Analytics and statistics
+        function updateSessionStats() {
+            sessionStats.totalMessages = conversationHistory.length;
+            sessionStats.totalCharacters = conversationHistory.reduce((sum, entry) => sum + entry.message.length, 0);
+            updateAnalytics();
+        }
+
+        function updateAnalytics() {
+            document.getElementById('exchangeCount').textContent = Math.ceil(conversationHistory.length / 2);
+            document.getElementById('totalMessages').textContent = sessionStats.totalMessages;
+            
+            const avgLength = sessionStats.totalMessages > 0 ? 
+                Math.round(sessionStats.totalCharacters / sessionStats.totalMessages) : 0;
+            document.getElementById('avgMessageLength').textContent = avgLength;
+            
+            updateSessionDuration();
+        }
+
+        function updateSessionDuration() {
+            const duration = Date.now() - sessionStartTime;
+            const minutes = Math.floor(duration / 60000);
+            const seconds = Math.floor((duration % 60000) / 1000);
+            document.getElementById('sessionDuration').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Utility functions
+        function clearDoctorTranscript() {
+            document.getElementById('doctorTranscript').value = '';
+            showNotification('Doctor transcript cleared', 'info');
+        }
+
+        function clearPatientInput() {
+            document.getElementById('patientInput').value = '';
+            showNotification('Patient input cleared', 'info');
+        }
+
+        function processDoctor() {
+            const transcript = document.getElementById('doctorTranscript').value.trim();
+            if (!transcript) {
+                showNotification('No transcript to process', 'error');
+                return;
+            }
+            showNotification('Doctor message processed', 'success');
+        }
+
+        function resetSession() {
+            if (confirm('Are you sure you want to reset the current session? This will clear all conversation history.')) {
+                conversationHistory = [];
+                sessionStats = { totalMessages: 0, totalCharacters: 0 };
+                exchangeCount = 0;
+                sessionStartTime = Date.now();
+                
+                clearDoctorTranscript();
+                clearPatientInput();
+                updateConversationDisplay();
+                updateAnalytics();
+                
+                showNotification('Session reset successfully', 'success');
+            }
+        }
+
+        function exportSession() {
+            if (conversationHistory.length === 0) {
+                showNotification('No conversation to export', 'error');
+                return;
+            }
+            
+            const sessionData = {
+                timestamp: new Date().toISOString(),
+                duration: Date.now() - sessionStartTime,
+                statistics: sessionStats,
+                conversation: conversationHistory
+            };
+            
+            const dataStr = JSON.stringify(sessionData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `medical_session_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Session exported successfully', 'success');
+        }
+
+        function showSystemInfo() {
+            const info = `
+Enhanced Medical Communication System v2.0
+
+Features:
+• Web Speech API integration
+• Multi-language support (6 languages)
+• Real-time speech recognition
+• Text-to-speech synthesis
+• Session analytics and export
+• Responsive design
+
+Browser Compatibility:
+• Chrome/Edge: Full functionality
+• Firefox: Limited speech features
+• Safari: Basic functionality
+
+System Status:
+• Speech Recognition: ${recognition ? 'Available' : 'Not Available'}
+• Text-to-Speech: ${speechSynthesis ? 'Available' : 'Not Available'}
+• Session Active: ${conversationHistory.length > 0 ? 'Yes' : 'No'}
+            `;
+            
+            alert(info);
+        }
+
+        function showHelp() {
+            const help = `
+HOW TO USE:
+
+Doctor Communication:
+1. Click "Press to Record" to start recording
+2. Speak clearly into your microphone  
+3. Click "Process Speech" when done
+
+Patient Response:
+1. Type the patient's message in the text area
+2. Select appropriate language if needed
+3. Click "Speak Message" to convert to speech
+
+Additional Features:
+• View real-time session analytics
+• Export conversation history as JSON
+• Reset session to start fresh
+• Multi-language auto-detection
+
+Voice Commands:
+• Clear transcript/input areas
+• Process recorded speech
+• Reset entire session
+
+Tips:
+• Ensure microphone permissions are granted
+• Speak clearly and at moderate pace
+• Use Chrome or Edge for best compatibility
+            `;
+            
+            alert(help);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('doctorRecordBtn').addEventListener('click', toggleRecording);
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSpeechRecognition();
+            updateAnalytics();
+            
+            // Start session duration timer
+            setInterval(updateSessionDuration, 1000);
+            
+            showNotification('Medical Communication System initialized', 'success');
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        toggleRecording();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        speakPatientMessage();
+                        break;
+                    case 'Enter':
+                        if (e.shiftKey) {
+                            e.preventDefault();
+                            speakPatientMessage();
+                        }
+                        break;
+                }
+            }
+        });
+
+        // Auto-resize patient input
+        document.getElementById('patientInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Language change handler
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            showNotification(`Language changed to: ${this.options[this.selectedIndex].text}`, 'info');
+        });
+
+        // Prevent form submission on Enter in patient input (allow Shift+Enter for new line)
+        document.getElementById('patientInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                speakPatientMessage();
+            }
+        });
+
+        // Auto-save functionality (stores in localStorage)
+        function autoSave() {
+            const sessionData = {
+                conversationHistory,
+                sessionStats,
+                exchangeCount,
+                sessionStartTime
+            };
+            localStorage.setItem('medicalSystemSession', JSON.stringify(sessionData));
+        }
+
+        function loadSavedSession() {
+            const saved = localStorage.getItem('medicalSystemSession');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (confirm('Found a previous session. Would you like to restore it?')) {
+                        conversationHistory = data.conversationHistory || [];
+                        sessionStats = data.sessionStats || { totalMessages: 0, totalCharacters: 0 };
+                        exchangeCount = data.exchangeCount || 0;
+                        sessionStartTime = data.sessionStartTime || Date.now();
+                        
+                        updateConversationDisplay();
+                        updateAnalytics();
+                        showNotification('Previous session restored', 'success');
+                    } else {
+                        localStorage.removeItem('medicalSystemSession');
+                    }
+                } catch (e) {
+                    console.error('Failed to load saved session:', e);
+                    localStorage.removeItem('medicalSystemSession');
+                }
+            }
+        }
+
+        // Save session periodically
+        setInterval(autoSave, 30000); // Save every 30 seconds
+
+        // Load saved session on startup
+        setTimeout(loadSavedSession, 1000);
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            autoSave();
+        });
+    </script>
+</body>
+</html>
