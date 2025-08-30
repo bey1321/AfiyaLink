@@ -1,153 +1,166 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/common/components/ui/button";
-import { Input } from "@/common/components/ui/input";
-import { Card, CardContent } from "@/common/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/common/components/ui/collapsible";
-import { Search, Send, User, ChevronLeft, ChevronRight, Mic, Globe, Bot, MapPin } from "lucide-react";
-import { motion } from "framer-motion";
+import { Send, Mic } from "lucide-react";
 
-export default function ChatbotUI() {
-  const [prompt, setPrompt] = useState("");
-  const [open, setOpen] = useState(true);
+interface ChatMessage {
+  sender: "user" | "bot";
+  text: string;
+}
+
+export default function HomePage() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [started, setStarted] = useState(false);
+
+  const sendMessage = async (msg?: string) => {
+    const userText = msg || input;
+    if (!userText.trim()) return;
+
+    setStarted(true);
+
+    const newMessage: ChatMessage = { sender: "user", text: userText };
+    setMessages([...messages, newMessage]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/health-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: newMessage.text,
+          user_id: "frontend-demo",
+          language: "en",
+          cultural_background: "general",
+        }),
+      });
+
+      const data = await response.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: data.response || "⚠️ No response received" },
+      ]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "⚠️ System error. Please try again." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex h-screen bg-white">
-      {/* Collapsible Sidebar */}
-      <Collapsible
-        open={open}
-        onOpenChange={setOpen}
-        className={`transition-all duration-300 ${
-          open ? "w-72" : "w-16"
-        } bg-gradient-to-b from-[var(--primary-color)] to-[var(--secondary-color)] text-white flex flex-col`}
-      >
-        {/* Toggle Button */}
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="self-end p-1 m-2 text-white rounded-full hover:bg-white/10"
-          >
-            {open ? <ChevronLeft /> : <ChevronRight />}
-          </Button>
-        </CollapsibleTrigger>
+      <main className="min-h-screen flex flex-col bg-gradient-to-b from-[var(--secondary-color)] to-[var(--tertiary-color)]">
+        {!started ? (
+            // Initial Landing Screen
+            <div className="flex flex-col items-center justify-center flex-1 text-center px-4">
+              {/* Logo */}
+              <div className="mb-6">
+            <span className="text-4xl font-extrabold text-[var(--primary-color)]">
+              🏥
+            </span>
+              </div>
 
-        {/* Sidebar Content */}
-        <CollapsibleContent forceMount>
-          <div className="flex flex-col h-full p-4">
-            <h1 className="mb-6 text-xl font-bold">AfiyaLink</h1>
+              {/* Heading */}
+              <h1 className="text-3xl font-bold text-gray-800 mb-3">
+                How can we <span className="text-[var(--primary-color)]">assist</span> you today?
+              </h1>
 
-            {/* Search */}
-            <div className="flex items-center px-3 py-2 mb-4 rounded-lg bg-white/20">
-              <Search className="w-4 h-4 mr-2 text-white" />
-              <input
-                placeholder="Search features"
-                className="w-full text-sm text-white bg-transparent outline-none placeholder:text-white/70"
-              />
-            </div>
+              {/* Subtext */}
+              <p className="text-gray-600 max-w-xl mb-8">
+                Get quick, reliable health guidance powered by AfiyaLink. Choose a
+                prompt to get started or type your own health question below.
+              </p>
 
-            {/* Features */}
-            <div className="flex flex-col gap-2">
-              {[
-                { label: "Real-time Translation", icon: Globe },
-                { label: "Voice Assistant", icon: Mic },
-                { label: "AI Chatbot", icon: Bot },
-                { label: "Clinic Finder", icon: MapPin },
-              ].map((item) => (
-                <Button
-                  key={item.label}
-                  className="flex items-center justify-between px-3 py-2 transition rounded-lg bg-white/10 hover:bg-white/20"
+              {/* Suggested Prompts */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mb-12">
+                {[
+                  "Headache Help",
+                  "Medication Info",
+                  "Wellness Tips",
+                  "General Support",
+                ].map((prompt) => (
+                    <button
+                        key={prompt}
+                        onClick={() => sendMessage(prompt)}
+                        className="p-4 bg-white shadow-md rounded-xl text-gray-800 font-medium hover:shadow-lg transition"
+                    >
+                      {prompt}
+                    </button>
+                ))}
+              </div>
+
+              {/* Input */}
+              <div className="w-full max-w-2xl flex items-center border rounded-full px-4 py-2 bg-white shadow-md">
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your prompt here..."
+                    className="flex-1 px-2 py-2 focus:outline-none"
+                />
+                <button
+                    onClick={() => sendMessage()}
+                    disabled={loading}
+                    className="text-white bg-[var(--primary-color)] p-2 rounded-full disabled:opacity-50"
                 >
-                  <span className="flex items-center gap-2">
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </span>
-                </Button>
-              ))}
-            </div>
-
-            {/* Recent Chats */}
-            <div className="flex-1 mt-6">
-              <h2 className="mb-2 text-sm font-semibold">Recent Conversations</h2>
-              <div className="flex flex-col gap-2 text-sm">
-                <Button className="px-3 py-2 text-left rounded-lg bg-white/10 hover:bg-white/20">
-                  Translate my prescription
-                </Button>
-                <Button className="px-3 py-2 text-left rounded-lg bg-white/10 hover:bg-white/20">
-                  Find nearby accessible clinics
-                </Button>
+                  <Send className="w-5 h-5" />
+                </button>
+                <button className="ml-2 text-gray-500 hover:text-[var(--primary-color)]">
+                  <Mic className="w-5 h-5" />
+                </button>
               </div>
             </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+        ) : (
+            // Chat Screen
+            <div className="flex flex-col flex-1 items-center justify-center p-6">
+              <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-6 flex flex-col flex-1">
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto mb-4 space-y-3">
+                  {messages.map((msg, idx) => (
+                      <div
+                          key={idx}
+                          className={`p-3 rounded-xl max-w-[80%] ${
+                              msg.sender === "user"
+                                  ? "ml-auto bg-[var(--primary-color)] text-white"
+                                  : "mr-auto bg-gray-100 text-gray-800"
+                          }`}
+                      >
+                        {msg.text}
+                      </div>
+                  ))}
+                  {loading && (
+                      <div className="mr-auto bg-gray-100 text-gray-600 p-3 rounded-xl">
+                        Typing...
+                      </div>
+                  )}
+                </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col bg-[var(--tertiary-color)]/10 relative">
-        {/* Tabs */}
-        <div className="flex justify-center py-4 space-x-6 bg-white shadow-md">
-          {["Translation", "Voice Assistant", "Chatbot", "Clinic Finder"].map((tab, i) => (
-            <Button
-              key={i}
-              className={`px-4 py-2 rounded-full ${
-                i === 0
-                  ? "bg-primary-color text-white"
-                  : "text-gray-600 bg-white hover:bg-accent-color"
-              }`}
-            >
-              {tab}
-            </Button>
-          ))}
-        </div>
-
-        {/* Hero Section */}
-        <div className="flex flex-col items-center justify-center flex-1 px-6 text-center">
-          <motion.h2
-            className="mb-4 text-3xl font-bold"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Inclusive Digital Health for{" "}
-            <span className="text-[var(--primary-color)]">Everyone</span>
-          </motion.h2>
-          <p className="max-w-lg mb-8 text-gray-600">
-            Break down language and accessibility barriers in healthcare with
-            real-time AI support, voice assistants, chatbots, and more.
-          </p>
-
-          {/* Quick Feature Cards */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {[
-              "Translate Prescriptions",
-              "Ask the Voice Assistant",
-              "Chat with AI",
-              "Find Clinics Near You",
-            ].map((item) => (
-              <Card
-                key={item}
-                className="border border-gray-200 shadow-md cursor-pointer rounded-2xl hover:shadow-lg"
-              >
-                <CardContent className="p-6 font-medium text-center">
-                  {item}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Input Bar */}
-        <div className="absolute bottom-0 left-0 flex items-center w-full p-4 bg-white border-t">
-          <Input
-            placeholder="Type your request (e.g., 'Translate this prescription')"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="flex-1 px-4 rounded-full"
-          />
-          <Button className="ml-3 rounded-full bg-[var(--primary-color)] hover:bg-[var(--secondary-color)]">
-            <Send className="w-5 h-5" />
-          </Button>
-        </div>
+                {/* Input Box */}
+                <div className="flex gap-2">
+                  <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Ask your health question..."
+                      className="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+                  />
+                  <button
+                      onClick={() => sendMessage()}
+                      disabled={loading}
+                      className="bg-[var(--primary-color)] text-white px-4 py-2 rounded-xl flex items-center justify-center disabled:opacity-50"
+                  >
+                    <Send />
+                  </button>
+                </div>
+              </div>
+            </div>
+        )}
       </main>
-    </div>
   );
 }
