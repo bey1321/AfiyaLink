@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from schemas.translate_schema import TranslateRequest
-from services.translation_service import refine_medical_text, simple_translate
+from .schemas.translate_schema import TranslateRequest
+from .services.translation_service import refine_medical_text, simple_translate
 
 router = APIRouter()
 
